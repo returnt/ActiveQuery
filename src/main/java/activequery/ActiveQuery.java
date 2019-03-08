@@ -41,9 +41,15 @@ public class ActiveQuery<T extends IQueryBuilder> implements IQuerySource<T> {
     }
 
     @Override
-    public IQuerySource<T> from(final Class<? extends ITableSchema>... tables) {
+    public IQuerySource<T> from(final Class... tables) {
         IQuerySource.requireNonNull(tables, "tables is null");
         return new FromActiveQuery<>(this, tables);
+    }
+
+    @Override
+    public IQuerySource<T> from(final ITableSchema... tables) {
+        IQuerySource.requireNonNull(tables, "tables is null");
+        return new FromSchemaActiveQuery<>(this, tables);
     }
 
     @Override

@@ -24,7 +24,9 @@ public interface IQuerySource<T extends IQueryBuilder> {
     default void subscribeActual() throws Exception {
     }
 
-    IQuerySource<T> from(final Class<? extends ITableSchema>... tables);
+    IQuerySource<T> from(final Class... tables);
+
+    IQuerySource<T> from(final ITableSchema... tables);
 
     IQuerySource<T> select(final Field... fields);
 

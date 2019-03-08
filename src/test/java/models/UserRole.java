@@ -20,7 +20,7 @@ import activequery.operators.SimpleField;
  * Package PACKAGE_NAME
  * Created by 23.02.19 18:48
  */
-public class UserRole extends Model implements ITableSchema {
+public class UserRole extends Model {
 
     public static AbstractField userId = new AbstractField(new Field() {
         @Override

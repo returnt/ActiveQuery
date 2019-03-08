@@ -28,11 +28,17 @@ public abstract class Model implements IModel, ITableSchema {
     private IQuerySource<MysqlQueryBuilder> mActiveQuery;
 
     public Model() {
-        mActiveQuery = new ActiveQuery<>(new MysqlQueryBuilder());
+        mActiveQuery = new ActiveQuery<>(new MysqlQueryBuilder()).from(this);
     }
 
     @Override
-    public Model from(Class<? extends ITableSchema>... tables) {
+    public Model from(Class... tables) {
+        mActiveQuery = mActiveQuery.from(tables);
+        return this;
+    }
+
+    @Override
+    public Model from(ITableSchema... tables) {
         mActiveQuery = mActiveQuery.from(tables);
         return this;
     }

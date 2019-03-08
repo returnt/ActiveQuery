@@ -20,20 +20,19 @@ import activequery.conditions.ITableSchema;
  * Package activequery3.operators
  * Created by 23.02.19 17:54
  */
-public class FromActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class FromSchemaActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
 
-    private final Class[] mTables;
+    private final ITableSchema[] mTables;
 
-    public FromActiveQuery(final ActiveQuery<T> activeQuery, final Class... tables) {
+    public FromSchemaActiveQuery(final ActiveQuery<T> activeQuery, final ITableSchema... tables) {
         super(activeQuery);
         mTables = tables;
     }
 
     @Override
     public void subscribeActual() throws Exception {
-        for (Class table : mTables) {
-            final ITableSchema tableSchema = (ITableSchema) table.newInstance();
-            mQueryBuilder.applyFrom(tableSchema.tableName());
+        for (ITableSchema table : mTables) {
+            mQueryBuilder.applyFrom(table.tableName());
         }
     }
 }
