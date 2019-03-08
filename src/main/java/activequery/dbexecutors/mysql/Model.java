@@ -23,16 +23,12 @@ import java.util.List;
  * Package activequery3.impl
  * Created by 23.02.19 23:50
  */
-public class Model implements IModel {
+public abstract class Model implements IModel, ITableSchema {
 
     private IQuerySource<MysqlQueryBuilder> mActiveQuery;
 
     public Model() {
         mActiveQuery = new ActiveQuery<>(new MysqlQueryBuilder());
-    }
-
-    public static Model newInstance() {
-        return new Model();
     }
 
     @Override

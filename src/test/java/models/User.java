@@ -7,7 +7,6 @@ package models; /**
  */
 
 import activequery.conditions.AbstractField;
-import activequery.conditions.ITableSchema;
 import activequery.dbexecutors.mysql.Model;
 import activequery.operators.SimpleField;
 
@@ -19,7 +18,7 @@ import activequery.operators.SimpleField;
  * Package PACKAGE_NAME
  * Created by 23.02.19 18:48
  */
-public class User extends Model implements ITableSchema {
+public class User extends Model {
 
     public static AbstractField id = new SimpleField("users", "id", "ID");
     public static AbstractField email = new SimpleField("email");
