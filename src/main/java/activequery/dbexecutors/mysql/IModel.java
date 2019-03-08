@@ -24,4 +24,8 @@ import java.util.List;
 public interface IModel extends IQuerySource<MysqlQueryBuilder> {
 
     <R> List<R> get(final Class<R> rClass);
+
+    <R> R first(final Class<R> rClass);
+
+    <R> Integer count(final Class<R> rClass);
 }

@@ -138,17 +138,20 @@ public abstract class Model implements IModel, ITableSchema {
         return mActiveQuery.build();
     }
 
+    @Override
     public <R> List<R> get(final Class<R> rClass) {
         final DriverManager driverManager = new DriverManager(build());
         return driverManager.executeQueryGet(rClass);
     }
 
+    @Override
     public <R> R first(final Class<R> rClass) {
         final DriverManager driverManager = new DriverManager(build());
         final List<R> rs = driverManager.executeQueryGet(rClass);
         return !rs.isEmpty() ? rs.get(0) : null;
     }
 
+    @Override
     public <R> Integer count(final Class<R> rClass) {
         return get(rClass).size();
     }

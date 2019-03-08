@@ -19,4 +19,18 @@ package activequery.conditions;
 public interface ITableSchema {
 
     String tableName();
+
+    default Field ALL() {
+        return new Field() {
+            @Override
+            public String table() {
+                return tableName();
+            }
+
+            @Override
+            public String field() {
+                return "*";
+            }
+        };
+    }
 }
