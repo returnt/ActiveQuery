@@ -6,7 +6,8 @@
 
     <groupId>ActiveQuery</groupId>
     <artifactId>ActiveQuery</artifactId>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
+
     <build>
         <plugins>
             <plugin>
@@ -19,7 +20,6 @@
             </plugin>
         </plugins>
     </build>
-
 
     <dependencies>
         <dependency>

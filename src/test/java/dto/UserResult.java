@@ -10,6 +10,8 @@ package dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.sql.Date;
+
 /**
  * Class UserResult
  *
@@ -24,14 +26,16 @@ public class UserResult {
     private Integer id;
     private String email;
     private Integer roles;
+    private Date createdAt;
 
     public UserResult() {
     }
 
-    public UserResult(Integer id, String email, Integer roles) {
+    public UserResult(Integer id, String email, Integer roles, Date createdAt) {
         this.id = id;
         this.email = email;
         this.roles = roles;
+        this.createdAt = createdAt;
     }
 
     public Integer getId() {
@@ -44,5 +48,9 @@ public class UserResult {
 
     public Integer getRoles() {
         return roles;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 }

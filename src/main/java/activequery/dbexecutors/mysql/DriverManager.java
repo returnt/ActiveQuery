@@ -11,10 +11,7 @@ package activequery.dbexecutors.mysql;
 import activequery.adapters.MysqlQueryBuilder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -96,7 +93,7 @@ public class DriverManager {
                     final int count = rsmd.getColumnCount();
                     for (int i = 1; i <= count; i++) {
                         final String columnName = rsmd.getColumnLabel(i);
-                        map.put(columnName, rs.getObject(columnName));
+                        map.put(columnName, getValue(rsmd.getColumnType(i), columnName));
                     }
                 }
                 resList.add(map);
@@ -150,6 +147,29 @@ public class DriverManager {
             } catch (Exception se) {
                 LOGGER.log(Level.WARNING, "PreparedStatement close exception");
             }
+        }
+    }
+
+    private Object getValue(final int type, final String columnName) throws SQLException {
+        switch (type) {
+            case Types.DATE:
+                return rs.getDate(columnName);
+            case Types.TIMESTAMP:
+                return rs.getTimestamp(columnName);
+            case Types.TIME:
+                return rs.getTime(columnName);
+            case Types.INTEGER:
+                return rs.getInt(columnName);
+            case Types.VARCHAR:
+                return rs.getString(columnName);
+            case Types.BOOLEAN:
+                return rs.getBoolean(columnName);
+            case Types.DOUBLE:
+                return rs.getDouble(columnName);
+            case Types.FLOAT:
+                return rs.getFloat(columnName);
+            default:
+                return rs.getObject(columnName);
         }
     }
 }

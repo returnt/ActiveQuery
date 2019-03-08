@@ -22,6 +22,7 @@ public class User extends Model {
 
     public static AbstractField id = new SimpleField("users", "id", "ID");
     public static AbstractField email = new SimpleField("email");
+    public static AbstractField createdAt = new SimpleField("created_at");
 
     @Override
     public String tableName() {

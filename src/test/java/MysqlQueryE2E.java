@@ -14,9 +14,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.sql.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
-
-import static activequery.aggregations.All.ALL;
 
 /**
  * Class MysqlQueryE2E
@@ -32,11 +33,19 @@ public class MysqlQueryE2E {
 
     @Before
     public void init() {
-        userResult = new UserResult(1, "test@example.com", 2);
+        final Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(Calendar.YEAR, 2018);
+        calendar.set(Calendar.MONTH, 10);
+        calendar.set(Calendar.DAY_OF_MONTH, 27);
+        calendar.set(Calendar.HOUR, 20);
+        calendar.set(Calendar.MINUTE, 18);
+        calendar.set(Calendar.SECOND, 23);
+        userResult = new UserResult(1, "test@example.com", 2, new Date(calendar.getTimeInMillis()));
         final DriverManager driverManager = new DriverManager();
         final String createUsersTable = "CREATE TABLE users " +
             "(ID INTEGER not NULL, " +
             " email VARCHAR(255), " +
+            " created_at DATETIME(6), " +
             " PRIMARY KEY ( id ))";
         driverManager.executeUpdate(createUsersTable);
 
@@ -47,7 +56,7 @@ public class MysqlQueryE2E {
             " PRIMARY KEY ( id ))";
         driverManager.executeUpdate(createUserRoleTable);
 
-        final String insertUser = "INSERT INTO users VALUES (1, 'test@example.com')";
+        final String insertUser = "INSERT INTO users VALUES (1, 'test@example.com', '2018-11-28 20:18:23')";
         final String insertUserRole = "INSERT INTO users_roles VALUES (1, 1, 2)";
         driverManager.executeUpdate(insertUser);
         driverManager.executeUpdate(insertUserRole);
@@ -56,11 +65,15 @@ public class MysqlQueryE2E {
     @Test
     public void getUserJoinRole() {
         final List<UserResult> pairRes = new User()
-            .select(User.id.as("id"), User.email, UserRole.roleId)
+            .select(User.id.as("id"), User.email, UserRole.roleId, User.createdAt.as("createdAt"))
             .innerJoin(UserRole.class, UserRole.userId.eq(User.id))
             .get(UserResult.class);
         Assert.assertEquals(userResult.getId(), pairRes.get(0).getId());
         Assert.assertEquals(userResult.getEmail(), pairRes.get(0).getEmail());
         Assert.assertEquals(userResult.getRoles(), pairRes.get(0).getRoles());
+        // TODO: 08.03.19  
+        Assert.assertEquals(userResult.getCreatedAt().getYear(), pairRes.get(0).getCreatedAt().getYear());
+        Assert.assertEquals(userResult.getCreatedAt().getMonth(), pairRes.get(0).getCreatedAt().getMonth());
+        Assert.assertEquals(userResult.getCreatedAt().getDay(), pairRes.get(0).getCreatedAt().getDay());
     }
 }
