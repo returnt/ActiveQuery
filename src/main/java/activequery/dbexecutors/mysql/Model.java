@@ -137,4 +137,14 @@ public abstract class Model implements IModel, ITableSchema {
         return driverManager.executeQueryGet(rClass);
     }
 
+    public <R> R first(final Class<R> rClass) {
+        final DriverManager driverManager = new DriverManager(build());
+        final List<R> rs = driverManager.executeQueryGet(rClass);
+        return !rs.isEmpty() ? rs.get(0) : null;
+    }
+
+    public <R> Integer count(final Class<R> rClass) {
+        return get(rClass).size();
+    }
+
 }
