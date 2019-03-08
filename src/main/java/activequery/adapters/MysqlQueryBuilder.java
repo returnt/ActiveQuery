@@ -58,7 +58,6 @@ public class MysqlQueryBuilder implements IQueryBuilder {
 
     @Override
     public void applySelect(final Field select) {
-        applyFrom(select.table());
         final String alias = !quoteName(select.alias()).isEmpty() ? " AS ".concat(quoteName(select.alias())) : "";
         mSelect.add(mapAggregation(select).concat(alias));
     }
@@ -168,6 +167,7 @@ public class MysqlQueryBuilder implements IQueryBuilder {
             .map(p::matcher)
             .filter(Matcher::find)
             .map(matcher -> matcher.group(1))
+            .filter(s -> !s.equals("*"))
             .collect(Collectors.toSet());
     }
 
@@ -248,7 +248,7 @@ public class MysqlQueryBuilder implements IQueryBuilder {
         }
     }
 
-    private String mapQueryArgs(final Object r){
+    private String mapQueryArgs(final Object r) {
         mQueryArgs.add(r);
         return "?";
     }
@@ -293,6 +293,8 @@ public class MysqlQueryBuilder implements IQueryBuilder {
             condition.append("SUM(");
             condition.append(quoteField(field));
             condition.append(")");
+        } else if (field instanceof All) {
+            condition.append(field.field());
         } else {
             condition.append(quoteField(field));
         }

@@ -34,8 +34,8 @@ import static activequery.conditions.Condition.*;
  */
 public class MySqlActiveQueryE2E {
 
-    private static final String SELECT = "SELECT COUNT(`users`.`id`) AS `countId`, `users`.`id` AS `ID`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, `*`, `id`, `email`, SUM(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID` FROM `users`, `users_roles`";
-    private static final String FROM = "SELECT `*` FROM `users`, `users_roles`";
+    private static final String SELECT = "SELECT COUNT(`users`.`id`) AS `countId`, `users`.`id` AS `ID`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, `id`, `email`, *, SUM(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID` FROM `users`";
+    private static final String FROM = "SELECT * FROM `users`, `users_roles`";
     private static final String WHERE = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` %s ?";
     private static final String WHERE_AND = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` = `users`.`id` AND `users`.`id` = `users`.`id`";
     private static final String WHERE_OR = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` = `users`.`id` OR `users`.`id` = `users`.`id`";
@@ -60,6 +60,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void select() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(
                 ALL(),
                 User.id, User.email,
@@ -100,6 +101,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereAnd() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func ->
                 func.add(User.id.eq(User.id))
@@ -125,6 +127,7 @@ public class MySqlActiveQueryE2E {
         Assert.assertEquals(WHERE_AND, query);
 
         final String query2 = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(User.id.eq(User.id), User.id.eq(User.id))
             .build()
@@ -133,6 +136,7 @@ public class MySqlActiveQueryE2E {
         Assert.assertEquals(WHERE_AND, query2);
 
         final String query3 = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(User.id.eq(User.id))
             .where(User.id.eq(User.id))
@@ -145,6 +149,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereOr() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func ->
                 func.add(User.id.eq(User.id))
@@ -155,6 +160,7 @@ public class MySqlActiveQueryE2E {
         Assert.assertEquals(WHERE_OR, query);
 
         final String query2 = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(User.id.eq(User.id))
             .orWhere(User.id.eq(User.id))
@@ -167,6 +173,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereAndNot() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func ->
                 func.add(User.id.eq(User.id))
@@ -180,6 +187,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereAndGroup() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func ->
                 func.add(User.id.eq(User.id))
@@ -196,6 +204,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereOrGroup() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func ->
                 func.add(User.id.eq(User.id))
@@ -212,6 +221,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereIn() {
         final MysqlQueryBuilder query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func -> func.add(User.id.in(Arrays.asList(10, 20, 30))))
             .build();
@@ -224,6 +234,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereBetween() {
         final MysqlQueryBuilder query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func -> func.add(User.id.between(Arrays.asList("2018-12", "2019-12"))))
             .build();
@@ -235,6 +246,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void whereLike() {
         final MysqlQueryBuilder query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(User.id.like("%name%"))
             .build();
@@ -288,6 +300,7 @@ public class MySqlActiveQueryE2E {
     public void innerJoin() {
         final ActiveQuery<MysqlQueryBuilder> activeQuery = getActiveQuery();
         final MysqlQueryBuilder query = activeQuery
+            .from(User.class)
             .select(User.id)
             .innerJoin(prepareJoinCondition())
             .build();
@@ -296,8 +309,9 @@ public class MySqlActiveQueryE2E {
 
         final ActiveQuery<MysqlQueryBuilder> activeQuery2 = getActiveQuery();
         final MysqlQueryBuilder query2 = activeQuery2
+            .from(User.class)
             .select(User.id)
-            .innerJoin(UserRole.class,  UserRole.userId.eq(User.id))
+            .innerJoin(UserRole.class, UserRole.userId.eq(User.id))
             .build();
         Assert.assertEquals(INNER_JOIN_2, query2.getQuery().toString());
     }
@@ -306,6 +320,7 @@ public class MySqlActiveQueryE2E {
     public void leftJoin() {
         final ActiveQuery<MysqlQueryBuilder> activeQuery = getActiveQuery();
         final MysqlQueryBuilder query = activeQuery
+            .from(User.class)
             .select(User.id)
             .leftJoin(prepareJoinCondition())
             .build();
@@ -314,8 +329,9 @@ public class MySqlActiveQueryE2E {
 
         final ActiveQuery<MysqlQueryBuilder> activeQuery2 = getActiveQuery();
         final MysqlQueryBuilder query2 = activeQuery2
+            .from(User.class)
             .select(User.id)
-            .leftJoin(UserRole.class,  UserRole.userId.eq(User.id))
+            .leftJoin(UserRole.class, UserRole.userId.eq(User.id))
             .build();
         Assert.assertEquals(LEFT_JOIN_2, query2.getQuery().toString());
     }
@@ -324,6 +340,7 @@ public class MySqlActiveQueryE2E {
     public void rightJoin() {
         final ActiveQuery<MysqlQueryBuilder> activeQuery = getActiveQuery();
         final MysqlQueryBuilder query = activeQuery
+            .from(User.class)
             .select(User.id)
             .rightJoin(prepareJoinCondition())
             .build();
@@ -332,8 +349,9 @@ public class MySqlActiveQueryE2E {
 
         final ActiveQuery<MysqlQueryBuilder> activeQuery2 = getActiveQuery();
         final MysqlQueryBuilder query2 = activeQuery2
+            .from(User.class)
             .select(User.id)
-            .rightJoin(UserRole.class,  UserRole.userId.eq(User.id))
+            .rightJoin(UserRole.class, UserRole.userId.eq(User.id))
             .build();
         Assert.assertEquals(RIGHT_JOIN_2, query2.getQuery().toString());
     }
@@ -341,6 +359,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void groupBy() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .groupBy(User.id, UserRole.userId)
             .build()
@@ -352,6 +371,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void orderBy() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .orderBy(new OrderBy() {
                 @Override
@@ -383,6 +403,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void limit() {
         final String query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .limit(10L)
             .build()
@@ -394,6 +415,7 @@ public class MySqlActiveQueryE2E {
     @Test
     public void offset() {
         final MysqlQueryBuilder query = getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .offset(10L)
             .build();
@@ -433,6 +455,7 @@ public class MySqlActiveQueryE2E {
 
     private String prepareWhereCondition(final Condition condition) {
         return getActiveQuery()
+            .from(User.class)
             .select(User.id)
             .where(func -> func.add(new WhereFunc.Where() {
                 @Override

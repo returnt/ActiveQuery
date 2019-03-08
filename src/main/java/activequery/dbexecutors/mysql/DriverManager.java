@@ -14,10 +14,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSetMetaData;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -86,10 +84,20 @@ public class DriverManager {
 
             rs = stmt.executeQuery();
 
+            final Set<String> fieldsName = mMysqlQueryBuilder.getResultFieldsName();
             while (rs.next()) {
                 final Map<String, Object> map = new ConcurrentHashMap<>();
-                for (String fieldName : mMysqlQueryBuilder.getResultFieldsName()) {
-                    map.put(fieldName, rs.getObject(fieldName));
+                if (!fieldsName.isEmpty()) {
+                    for (String fieldName : fieldsName) {
+                        map.put(fieldName, rs.getObject(fieldName));
+                    }
+                } else {
+                    final ResultSetMetaData rsmd = rs.getMetaData();
+                    final int count = rsmd.getColumnCount();
+                    for (int i = 1; i <= count; i++) {
+                        final String columnName = rsmd.getColumnLabel(i);
+                        map.put(columnName, rs.getObject(columnName));
+                    }
                 }
                 resList.add(map);
             }

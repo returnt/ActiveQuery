@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static activequery.aggregations.All.ALL;
+
 /**
  * Class MysqlQueryE2E
  *
