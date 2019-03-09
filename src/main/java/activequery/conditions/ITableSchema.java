@@ -20,6 +20,10 @@ public interface ITableSchema {
 
     String tableName();
 
+    default Class getModelClass() {
+        return getClass();
+    }
+
     default Field ALL() {
         return new Field() {
             @Override

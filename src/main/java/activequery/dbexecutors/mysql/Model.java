@@ -138,10 +138,22 @@ public abstract class Model implements IModel, ITableSchema {
         return mActiveQuery.build();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> List<R> get() {
+        return get(getModelClass());
+    }
+
     @Override
     public <R> List<R> get(final Class<R> rClass) {
         final DriverManager driverManager = new DriverManager(build());
         return driverManager.executeQueryGet(rClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> R first() {
+        return (R) first(getModelClass());
     }
 
     @Override
@@ -149,6 +161,12 @@ public abstract class Model implements IModel, ITableSchema {
         final DriverManager driverManager = new DriverManager(build());
         final List<R> rs = driverManager.executeQueryGet(rClass);
         return !rs.isEmpty() ? rs.get(0) : null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Integer count() {
+        return count(getModelClass());
     }
 
     @Override

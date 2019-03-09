@@ -9,6 +9,9 @@ package models; /**
 import activequery.conditions.AbstractField;
 import activequery.dbexecutors.mysql.Model;
 import activequery.operators.SimpleField;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.sql.Date;
 
 /**
  * Class models.User
@@ -18,14 +21,42 @@ import activequery.operators.SimpleField;
  * Package PACKAGE_NAME
  * Created by 23.02.19 18:48
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends Model {
 
-    public static AbstractField id = new SimpleField("users", "id", "ID");
-    public static AbstractField email = new SimpleField("email");
-    public static AbstractField createdAt = new SimpleField("created_at");
+    private Integer id;
+    private String email;
+    private Date created_at;
+
+    public User() {
+    }
+
+    public User(Integer id, String email, Date created_at) {
+        this.id = id;
+        this.email = email;
+        this.created_at = created_at;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public Date getCreated_at() {
+        return created_at;
+    }
 
     @Override
     public String tableName() {
         return "users";
+    }
+
+    public static class Fields {
+        public static AbstractField id = new SimpleField("users", "id", "ID");
+        public static AbstractField email = new SimpleField("email");
+        public static AbstractField createdAt = new SimpleField("created_at");
     }
 }

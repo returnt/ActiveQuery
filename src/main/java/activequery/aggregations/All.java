@@ -9,6 +9,10 @@
 package activequery.aggregations;
 
 import activequery.conditions.AbstractField;
+import activequery.conditions.Field;
+import activequery.conditions.ITableSchema;
+
+import java.util.logging.Logger;
 
 /**
  * Class All
@@ -20,11 +24,28 @@ import activequery.conditions.AbstractField;
  */
 public class All extends AbstractField {
 
-    public All() {
-        super(() -> "*");
+    private static final Logger LOGGER = Logger.getLogger(All.class.getName());
+
+    public All(final Class aClass) {
+        super(new Field() {
+            @Override
+            public String table() {
+                try {
+                    return ((ITableSchema) aClass.newInstance()).tableName();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    LOGGER.warning(e.getMessage());
+                }
+                return null;
+            }
+
+            @Override
+            public String field() {
+                return "*";
+            }
+        });
     }
 
-    public static All ALL() {
-        return new All();
+    public static All ALL(final Class aClass) {
+        return new All(aClass);
     }
 }

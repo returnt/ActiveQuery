@@ -294,7 +294,7 @@ public class MysqlQueryBuilder implements IQueryBuilder {
             condition.append(quoteField(field));
             condition.append(")");
         } else if (field instanceof All) {
-            condition.append(field.field());
+            condition.append(quoteField(field));
         } else {
             condition.append(quoteField(field));
         }
