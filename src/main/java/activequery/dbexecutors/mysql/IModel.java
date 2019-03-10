@@ -10,6 +10,7 @@ package activequery.dbexecutors.mysql;
 
 import activequery.IQuerySource;
 import activequery.adapters.MysqlQueryBuilder;
+import activequery.conditions.Field;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ import java.util.List;
  */
 public interface IModel extends IQuerySource<MysqlQueryBuilder> {
 
+    Model selectAll(final Field... fields);
+
     <R> List<R> get();
 
     <R> List<R> get(final Class<R> rClass);
@@ -34,4 +37,6 @@ public interface IModel extends IQuerySource<MysqlQueryBuilder> {
     Integer count();
 
     <R> Integer count(final Class<R> rClass);
+
+    <R> R save();
 }

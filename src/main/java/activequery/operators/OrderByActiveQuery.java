@@ -20,7 +20,7 @@ import activequery.conditions.OrderBy;
  * Package activequery3.operators
  * Created by 03.03.19 21:26
  */
-public class OrderByActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class OrderByActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final OrderBy[] mOrderBy;
 

@@ -20,7 +20,7 @@ import activequery.conditions.Field;
  * Package activequery3.operators
  * Created by 23.02.19 18:08
  */
-public class SelectActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class SelectActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final Field[] mFields;
 

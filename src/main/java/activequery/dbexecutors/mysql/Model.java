@@ -11,9 +11,14 @@ package activequery.dbexecutors.mysql;
 import activequery.ActiveQuery;
 import activequery.IQuerySource;
 import activequery.adapters.MysqlQueryBuilder;
+import activequery.adapters.MysqlSaveQueryBuilder;
+import activequery.annotations.PrimaryKey;
 import activequery.conditions.*;
+import activequery.operators.SimpleField;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class Model
@@ -25,56 +30,70 @@ import java.util.List;
  */
 public abstract class Model implements IModel, ITableSchema {
 
+    private static final Logger LOGGER = Logger.getLogger(Model.class.getName());
+
+    private DriverManager driverManager;
     private IQuerySource<MysqlQueryBuilder> mActiveQuery;
+    private boolean isSelectOverride;
 
     public Model() {
-        mActiveQuery = new ActiveQuery<>(new MysqlQueryBuilder()).from(this);
+        driverManager = new DriverManager();
+        mActiveQuery = ActiveQuery.from(new MysqlQueryBuilder(), this);
+        isSelectOverride = false;
     }
 
     @Override
-    public Model from(Class... tables) {
+    public Model from(final Class... tables) {
         mActiveQuery = mActiveQuery.from(tables);
         return this;
     }
 
     @Override
-    public Model from(ITableSchema... tables) {
+    public Model from(final ITableSchema... tables) {
         mActiveQuery = mActiveQuery.from(tables);
         return this;
     }
 
     @Override
-    public Model select(Field... fields) {
+    public Model select(final Field... fields) {
+        isSelectOverride = true;
         mActiveQuery = mActiveQuery.select(fields);
         return this;
     }
 
     @Override
-    public Model where(WhereFunc.Where func) {
+    public Model selectAll(final Field... fields) {
+        isSelectOverride = true;
+        mActiveQuery = mActiveQuery.select(ALL()).select(fields);
+        return this;
+    }
+
+    @Override
+    public Model where(final WhereFunc.Where func) {
         mActiveQuery = mActiveQuery.where(func);
         return this;
     }
 
     @Override
-    public Model where(WhereFunc.Where... func) {
+    public Model where(final WhereFunc.Where... func) {
         mActiveQuery = mActiveQuery.where(func);
         return this;
     }
 
     @Override
-    public Model orWhere(WhereFunc.Where... func) {
+    public Model orWhere(final WhereFunc.Where... func) {
         mActiveQuery = mActiveQuery.orWhere(func);
         return this;
     }
 
     @Override
-    public Model where(WhereFunc func) {
+    public Model where(final WhereFunc func) {
         mActiveQuery = mActiveQuery.where(func);
         return this;
     }
 
     @Override
-    public Model innerJoin(Join func) {
+    public Model innerJoin(final Join func) {
         mActiveQuery = mActiveQuery.innerJoin(func);
         return this;
     }
@@ -86,55 +105,58 @@ public abstract class Model implements IModel, ITableSchema {
     }
 
     @Override
-    public Model leftJoin(Join func) {
+    public Model leftJoin(final Join func) {
         mActiveQuery = mActiveQuery.leftJoin(func);
         return this;
     }
 
     @Override
-    public Model leftJoin(Class aClass, WhereFunc.Where... func) {
+    public Model leftJoin(final Class aClass, final WhereFunc.Where... func) {
         mActiveQuery = mActiveQuery.leftJoin(aClass, func);
         return this;
     }
 
     @Override
-    public Model rightJoin(Join func) {
+    public Model rightJoin(final Join func) {
         mActiveQuery = mActiveQuery.rightJoin(func);
         return this;
     }
 
     @Override
-    public Model rightJoin(Class aClass, WhereFunc.Where... func) {
+    public Model rightJoin(final Class aClass, final WhereFunc.Where... func) {
         mActiveQuery = mActiveQuery.rightJoin(aClass, func);
         return this;
     }
 
     @Override
-    public Model groupBy(Field... fields) {
+    public Model groupBy(final Field... fields) {
         mActiveQuery = mActiveQuery.groupBy(fields);
         return this;
     }
 
     @Override
-    public Model orderBy(OrderBy... orders) {
+    public Model orderBy(final OrderBy... orders) {
         mActiveQuery = mActiveQuery.orderBy(orders);
         return this;
     }
 
     @Override
-    public Model limit(Long limit) {
+    public Model limit(final Long limit) {
         mActiveQuery = mActiveQuery.limit(limit);
         return this;
     }
 
     @Override
-    public Model offset(Long offset) {
+    public Model offset(final Long offset) {
         mActiveQuery = mActiveQuery.offset(offset);
         return this;
     }
 
     @Override
     public MysqlQueryBuilder build() {
+        if (!isSelectOverride) {
+            mActiveQuery = mActiveQuery.select(ALL());
+        }
         return mActiveQuery.build();
     }
 
@@ -146,8 +168,7 @@ public abstract class Model implements IModel, ITableSchema {
 
     @Override
     public <R> List<R> get(final Class<R> rClass) {
-        final DriverManager driverManager = new DriverManager(build());
-        return driverManager.executeQueryGet(rClass);
+        return driverManager.executeQuery(build(), rClass);
     }
 
     @SuppressWarnings("unchecked")
@@ -158,8 +179,7 @@ public abstract class Model implements IModel, ITableSchema {
 
     @Override
     public <R> R first(final Class<R> rClass) {
-        final DriverManager driverManager = new DriverManager(build());
-        final List<R> rs = driverManager.executeQueryGet(rClass);
+        final List<R> rs = driverManager.executeQuery(build(), rClass);
         return !rs.isEmpty() ? rs.get(0) : null;
     }
 
@@ -174,4 +194,35 @@ public abstract class Model implements IModel, ITableSchema {
         return get(rClass).size();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <R> R save() {
+        AbstractField fieldPrimary = null;
+        Object primaryValue = null;
+        final AbstractField[] fields = new AbstractField[getClass().getDeclaredFields().length];
+        final Object[] fieldsValue = new Object[getClass().getDeclaredFields().length];
+        final java.lang.reflect.Field[] fields1 = getClass().getDeclaredFields();
+        for (int i = 0; i < fields1.length; i++) {
+            // TODO: 10.03.19 add parse json property annotations
+            fields[i] = new SimpleField(fields1[i].getName());
+            fields1[i].setAccessible(true);
+            try {
+                final Object value = fields1[i].get(this);
+                fieldsValue[i] = value;
+            } catch (IllegalAccessException e) {
+                LOGGER.log(Level.OFF, e.getMessage());
+            }
+            final PrimaryKey primaryKey = fields1[i].getDeclaredAnnotation(PrimaryKey.class);
+            if (primaryKey != null) {
+                fieldPrimary = new SimpleField(primaryKey.name());
+                primaryValue = fieldsValue[i];
+            }
+        }
+        // TODO: 10.03.19 add exception if  fieldPrimary or primaryValue null
+        driverManager.executeUpdate(ActiveQuery.save(new MysqlSaveQueryBuilder(), getModelClass()).insert(fields).values(fieldsValue).build());
+        return (fieldPrimary != null) ? (R) driverManager.executeQuery(ActiveQuery
+            .from(new MysqlQueryBuilder(), getModelClass())
+            .select(ALL())
+            .where(fieldPrimary.eq(primaryValue)).build(), getModelClass()).get(0) : null;
+    }
 }

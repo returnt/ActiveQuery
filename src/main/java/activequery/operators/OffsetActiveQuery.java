@@ -19,7 +19,7 @@ import activequery.adapters.IQueryBuilder;
  * Package activequery3.operators
  * Created by 03.03.19 22:57
  */
-public class OffsetActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class OffsetActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final Long mOffset;
 

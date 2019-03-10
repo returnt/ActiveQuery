@@ -21,7 +21,7 @@ import activequery.conditions.WhereGroup;
  * Package activequery3.operators
  * Created by 23.02.19 20:40
  */
-public class WhereGroupActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class WhereGroupActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final WhereFunc mFunc;
 

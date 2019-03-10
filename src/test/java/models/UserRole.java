@@ -8,7 +8,6 @@ package models; /**
 
 import activequery.conditions.AbstractField;
 import activequery.conditions.Field;
-import activequery.conditions.ITableSchema;
 import activequery.dbexecutors.mysql.Model;
 import activequery.operators.SimpleField;
 

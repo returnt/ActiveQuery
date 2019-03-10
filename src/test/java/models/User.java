@@ -6,6 +6,7 @@ package models; /**
  * Created by 23.02.19 18:48
  */
 
+import activequery.annotations.PrimaryKey;
 import activequery.conditions.AbstractField;
 import activequery.dbexecutors.mysql.Model;
 import activequery.operators.SimpleField;
@@ -24,6 +25,7 @@ import java.sql.Date;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User extends Model {
 
+    @PrimaryKey
     private Integer id;
     private String email;
     private Date created_at;

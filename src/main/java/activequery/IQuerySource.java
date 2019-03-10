@@ -66,4 +66,21 @@ public interface IQuerySource<T extends IQueryBuilder> {
         }
         return object;
     }
+
+    interface Save<T extends IQueryBuilder.Save> {
+
+        IQuerySource.Save<T> table(final Class table);
+
+        IQuerySource.Save<T> table(final ITableSchema table);
+
+        IQuerySource.Save<T> insert(final Field... fields);
+
+        IQuerySource.Save<T> values(final Object... values);
+
+        T build();
+
+        default void subscribeActual() throws Exception {
+        }
+
+    }
 }

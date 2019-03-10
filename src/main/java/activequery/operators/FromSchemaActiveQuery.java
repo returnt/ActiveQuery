@@ -20,7 +20,7 @@ import activequery.conditions.ITableSchema;
  * Package activequery3.operators
  * Created by 23.02.19 17:54
  */
-public class FromSchemaActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class FromSchemaActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final ITableSchema[] mTables;
 

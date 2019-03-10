@@ -20,7 +20,7 @@ import activequery.conditions.ITableSchema;
  * Package activequery3.operators
  * Created by 23.02.19 17:54
  */
-public class FromActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class FromActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final Class[] mTables;
 
@@ -31,6 +31,7 @@ public class FromActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
 
     @Override
     public void subscribeActual() throws Exception {
+        mActiveQuery.subscribeActual();
         for (Class table : mTables) {
             final ITableSchema tableSchema = (ITableSchema) table.newInstance();
             mQueryBuilder.applyFrom(tableSchema.tableName());

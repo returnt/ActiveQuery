@@ -23,21 +23,37 @@ import java.util.logging.Logger;
  * Package activequery3
  * Created by 23.02.19 13:00
  */
-public class ActiveQuery<T extends IQueryBuilder> implements IQuerySource<T> {
+public class ActiveQuery<T extends IQueryBuilder.Select> implements IQuerySource<T> {
 
     private static final Logger LOGGER = Logger.getLogger(ActiveQuery.class.getName());
 
     protected final ActiveQuery<T> mActiveQuery;
     protected final T mQueryBuilder;
 
-    public ActiveQuery(final T queryBuilder) {
+    private ActiveQuery(final T queryBuilder) {
         mActiveQuery = this;
         mQueryBuilder = queryBuilder;
     }
 
-    public ActiveQuery(final ActiveQuery<T> activeQuery) {
+    protected ActiveQuery(final ActiveQuery<T> activeQuery) {
         mActiveQuery = activeQuery;
         mQueryBuilder = activeQuery.mQueryBuilder;
+    }
+
+    public static <Q extends IQueryBuilder.Select> IQuerySource<Q> from(final Q queryBuilder, final Class... tables) {
+        return new ActiveQuery<>(queryBuilder).from(tables);
+    }
+
+    public static <Q extends IQueryBuilder.Select> IQuerySource<Q> from(final Q queryBuilder, final ITableSchema tables) {
+        return new ActiveQuery<>(queryBuilder).from(tables);
+    }
+
+    public static <Q extends IQueryBuilder.Save> IQuerySource.Save<Q> save(final Q queryBuilder, final Class table) {
+        return new ActiveQuerySave<>(queryBuilder).table(table);
+    }
+
+    public static <Q extends IQueryBuilder.Save> IQuerySource.Save<Q> save(final Q queryBuilder, final ITableSchema table) {
+        return new ActiveQuerySave<>(queryBuilder).table(table);
     }
 
     @Override

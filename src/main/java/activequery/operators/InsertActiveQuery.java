@@ -1,30 +1,30 @@
 /**
- * File GroupByActiveQuery
+ * File InsertActiveQuery
  *
  * Author d.a.ganzha
  * Project TestDbDriver
- * Created by 03.03.19 21:06
+ * Created by 10.03.19 0:12
  */
 
 package activequery.operators;
 
-import activequery.ActiveQuery;
+import activequery.ActiveQuerySave;
 import activequery.adapters.IQueryBuilder;
 import activequery.conditions.Field;
 
 /**
- * Class GroupByActiveQuery
+ * Class InsertActiveQuery
  *
  * Author d.a.ganzha
  * Project TestDbDriver
- * Package activequery3.operators
- * Created by 03.03.19 21:06
+ * Package activequery.operators
+ * Created by 10.03.19 0:12
  */
-public class GroupByActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
+public class InsertActiveQuery<T extends IQueryBuilder.Save> extends ActiveQuerySave<T> {
 
     private final Field[] mFields;
 
-    public GroupByActiveQuery(final ActiveQuery<T> activeQuery, final Field... fields) {
+    public InsertActiveQuery(final ActiveQuerySave<T> activeQuery, final Field... fields) {
         super(activeQuery);
         mFields = fields;
     }
@@ -33,7 +33,7 @@ public class GroupByActiveQuery<T extends IQueryBuilder.Select> extends ActiveQu
     public void subscribeActual() throws Exception {
         mActiveQuery.subscribeActual();
         for (Field field : mFields) {
-            mQueryBuilder.applyGroupBy(field);
+            mQueryBuilder.applyInsert(field);
         }
     }
 }

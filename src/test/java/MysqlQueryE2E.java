@@ -15,9 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Date;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
+import java.util.*;
 
 /**
  * Class MysqlQueryE2E
@@ -47,29 +45,50 @@ public class MysqlQueryE2E {
             " email VARCHAR(255), " +
             " created_at DATETIME(6), " +
             " PRIMARY KEY ( id ))";
-        driverManager.executeUpdate(createUsersTable);
+        driverManager.executeUpdate(createUsersTable, Collections.emptyList());
 
         final String createUserRoleTable = "CREATE TABLE users_roles " +
             "(ID INTEGER not NULL, " +
             " users_id INTEGER, " +
             " roles INTEGER, " +
             " PRIMARY KEY ( id ))";
-        driverManager.executeUpdate(createUserRoleTable);
+        driverManager.executeUpdate(createUserRoleTable, Collections.emptyList());
 
         final String insertUser = "INSERT INTO users VALUES (1, 'test@example.com', '2018-11-28 20:18:23')";
         final String insertUserRole = "INSERT INTO users_roles VALUES (1, 1, 2)";
-        driverManager.executeUpdate(insertUser);
-        driverManager.executeUpdate(insertUserRole);
+        driverManager.executeUpdate(insertUser, Collections.emptyList());
+        driverManager.executeUpdate(insertUserRole, Collections.emptyList());
     }
 
     @Test
     public void getUserJoinRole() {
         final List<User> pairRes = new User()
-            .select(User.Fields.id.as("id"), User.Fields.email, UserRole.roleId, User.Fields.createdAt)
+            .selectAll(User.Fields.id.as("id"), User.Fields.email, UserRole.roleId, User.Fields.createdAt)
             .innerJoin(UserRole.class, UserRole.userId.eq(User.Fields.id))
             .get();
         Assert.assertEquals(mUser.getId(), pairRes.get(0).getId());
         Assert.assertEquals(mUser.getEmail(), pairRes.get(0).getEmail());
+
+        final User user = new User(new Random().nextInt(), "sdffs@sdf.sdf", new Date(Calendar.getInstance().getTimeInMillis())).save();
+        final List<User> users = new User().selectAll(User.Fields.id.as("id"), User.Fields.email, User.Fields.createdAt)
+            .get();
+
+        Assert.assertNotNull(user);
+        Assert.assertEquals(users.size(), 2);
+        // TODO: 08.03.19
+//        Assert.assertEquals(userResult.getCreatedAt().getYear(), pairRes.get(0).getCreatedAt().getYear());
+//        Assert.assertEquals(userResult.getCreatedAt().getMonth(), pairRes.get(0).getCreatedAt().getMonth());
+//        Assert.assertEquals(userResult.getCreatedAt().getDay(), pairRes.get(0).getCreatedAt().getDay());
+    }
+
+//    @Test
+    public void insert() {
+        new User(new Random().nextInt(), "sdffs@sdf.sdf", new Date(Calendar.getInstance().getTimeInMillis())).save();
+        final List<User> users = new User().selectAll(User.Fields.id.as("id"), User.Fields.email, UserRole.roleId, User.Fields.createdAt)
+            .innerJoin(UserRole.class, UserRole.userId.eq(User.Fields.id))
+            .get();
+
+        Assert.assertEquals(users.size(), 2);
         // TODO: 08.03.19
 //        Assert.assertEquals(userResult.getCreatedAt().getYear(), pairRes.get(0).getCreatedAt().getYear());
 //        Assert.assertEquals(userResult.getCreatedAt().getMonth(), pairRes.get(0).getCreatedAt().getMonth());

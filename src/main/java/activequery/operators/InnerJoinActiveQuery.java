@@ -23,7 +23,7 @@ import activequery.exceptions.CastTableTypeExeption;
  * Package activequery3.operators
  * Created by 03.03.19 19:00
  */
-public class InnerJoinActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class InnerJoinActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final Join mJoin;
 

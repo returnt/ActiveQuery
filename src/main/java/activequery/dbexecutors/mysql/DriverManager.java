@@ -8,7 +8,8 @@
 
 package activequery.dbexecutors.mysql;
 
-import activequery.adapters.MysqlQueryBuilder;
+import activequery.adapters.IQueryBuilder;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.*;
@@ -30,43 +31,29 @@ public class DriverManager {
     private static final Logger LOGGER = Logger.getLogger(DriverManager.class.getName());
 
     private final ObjectMapper mObjectMapper;
-    private final MysqlQueryBuilder mMysqlQueryBuilder;
 
     private Connection con;
     private PreparedStatement stmt;
     private ResultSet rs;
 
     public DriverManager() {
-        mMysqlQueryBuilder = new MysqlQueryBuilder();
         mObjectMapper = new ObjectMapper();
+        mObjectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
 
-    public DriverManager(MysqlQueryBuilder mysqlQueryBuilder) {
-        mMysqlQueryBuilder = mysqlQueryBuilder;
-        mObjectMapper = new ObjectMapper();
-    }
-
-    public <T> List<T> executeQueryGet(final Class<T> aClass) {
-        return executeQuery(mMysqlQueryBuilder.getQuery().toString(), aClass, mMysqlQueryBuilder.getQueryArgs());
-    }
-
-    public <T> List<T> executeQuery(final String query, final Class<T> tClass) {
-        return executeQuery(query, tClass, null);
-    }
-
-    public <T> List<T> executeQuery(final String query, final Class<T> tClass, final List<Object> args) {
+    public <T> List<T> executeQuery(final IQueryBuilder.Select query, final Class<T> tClass) {
         final List<T> resList = new ArrayList<>();
-        for (Map<String, Object> map : executeQuery(query, args)) {
+        for (Map<String, Object> map : executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName())) {
             resList.add(mObjectMapper.convertValue(map, tClass));
         }
         return resList;
     }
 
-    public List<Map<String, Object>> executeQuery(final String query) {
-        return executeQuery(query, Collections.emptyList());
+    public List<Map<String, Object>> executeQuery(final IQueryBuilder.Select query) {
+        return executeQuery(query.getQuery().toString(), Collections.emptyList(), query.getResultFieldsName());
     }
 
-    public List<Map<String, Object>> executeQuery(final String query, final List<Object> args) {
+    public List<Map<String, Object>> executeQuery(final String query, final List<Object> args, final Set<String> fieldsName) {
         final List<Map<String, Object>> resList = new ArrayList<>();
         try {
             con = java.sql.DriverManager.getConnection(System.getenv("DB_DRIVER"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"));
@@ -81,7 +68,6 @@ public class DriverManager {
 
             rs = stmt.executeQuery();
 
-            final Set<String> fieldsName = mMysqlQueryBuilder.getResultFieldsName();
             while (rs.next()) {
                 final Map<String, Object> map = new ConcurrentHashMap<>();
                 if (!fieldsName.isEmpty()) {
@@ -120,14 +106,14 @@ public class DriverManager {
         return resList;
     }
 
-    public void executeUpdate(final String query) {
-        executeUpdate(query, null);
+    public void executeUpdate(final IQueryBuilder.Save query) {
+        executeUpdate(query.getQuery().toString(), query.getQueryArguments());
     }
 
     public void executeUpdate(final String query, final List<Object> args) {
         try {
             con = java.sql.DriverManager.getConnection(System.getenv("DB_DRIVER"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"));
-            stmt = con.prepareStatement(query);
+            stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             if (args != null && !args.isEmpty()) {
                 for (int i = 1; i <= args.size(); i++) {
                     stmt.setObject(i, args.get(i - 1));

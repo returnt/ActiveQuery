@@ -8,6 +8,9 @@
 
 package activequery.conditions;
 
+import activequery.aggregations.All;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Interface ITableSchema
  *
@@ -20,21 +23,12 @@ public interface ITableSchema {
 
     String tableName();
 
+    @JsonIgnore
     default Class getModelClass() {
         return getClass();
     }
 
     default Field ALL() {
-        return new Field() {
-            @Override
-            public String table() {
-                return tableName();
-            }
-
-            @Override
-            public String field() {
-                return "*";
-            }
-        };
+        return new All(getModelClass());
     }
 }

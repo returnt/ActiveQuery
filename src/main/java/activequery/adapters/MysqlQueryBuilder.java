@@ -16,6 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static activequery.adapters.IQueryBuilder.quoteField;
+import static activequery.adapters.IQueryBuilder.quoteName;
+
 /**
  * Class MysqlQueryBuilder
  *
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
  * Package activequery3.adapters
  * Created by 23.02.19 13:14
  */
-public class MysqlQueryBuilder implements IQueryBuilder {
+public class MysqlQueryBuilder implements IQueryBuilder.Select {
 
     private final Set<String> mFrom;
     private final Set<String> mSelect;
@@ -171,20 +174,11 @@ public class MysqlQueryBuilder implements IQueryBuilder {
             .collect(Collectors.toSet());
     }
 
-    private String quoteName(final String name) {
-        return name != null && !name.isEmpty() ? "`".concat(name).concat("`") : "";
-    }
-
-    private String quoteField(final Field field) {
-        final String table = quoteName(field.table());
-        return (!table.isEmpty() ? table.concat(".") : "").concat(quoteName(field.field()));
-    }
-
     public StringBuilder getQuery() {
         return mQuery;
     }
 
-    public List<Object> getQueryArgs() {
+    public List<Object> getQueryArguments() {
         return mQueryArgs;
     }
 
@@ -294,7 +288,7 @@ public class MysqlQueryBuilder implements IQueryBuilder {
             condition.append(quoteField(field));
             condition.append(")");
         } else if (field instanceof All) {
-            condition.append(quoteField(field));
+            condition.append(quoteName(field.table()).concat(".").concat(field.field()));
         } else {
             condition.append(quoteField(field));
         }

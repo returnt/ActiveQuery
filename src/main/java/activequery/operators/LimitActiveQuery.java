@@ -19,7 +19,7 @@ import activequery.adapters.IQueryBuilder;
  * Package activequery3.operators
  * Created by 03.03.19 22:55
  */
-public class LimitActiveQuery<T extends IQueryBuilder> extends ActiveQuery<T> {
+public class LimitActiveQuery<T extends IQueryBuilder.Select> extends ActiveQuery<T> {
 
     private final Long mLimit;
 
