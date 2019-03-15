@@ -57,15 +57,11 @@ public class DriverManager {
     }
 
     public <T> List<T> executeQuery(final IQueryBuilder.Select query, final Class<T> tClass) {
-        final List<T> resList = new ArrayList<>();
-        for (Map<String, Object> map :
-            executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName()).stream()
-                .map(stringObjectMap -> stringObjectMap.entrySet().stream()
-                    .collect(HashMap<String, Object>::new, (m,v)->m.put(v.getKey().replace("_", ""), v.getValue()), HashMap::putAll))
-                .collect(toList())) {
-            resList.add(mObjectMapper.convertValue(map, tClass));
-        }
-        return resList;
+        return executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName()).stream()
+            .map(stringObjectMap -> stringObjectMap.entrySet().stream()
+                .collect(HashMap<String, Object>::new, (m, v) -> m.put(v.getKey().replace("_", ""), v.getValue()), HashMap::putAll))
+            .map(map -> mObjectMapper.convertValue(map, tClass))
+            .collect(toList());
     }
 
     public List<Map<String, Object>> executeQuery(final IQueryBuilder.Select query) {
