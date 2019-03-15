@@ -41,9 +41,9 @@ public abstract class Model implements IModel, ITableSchema {
         mActiveQuery = ActiveQuery.from(new MysqlQueryBuilder(), this);
     }
 
-    public Model(final DriverManager driverManager, final IQuerySource<MysqlQueryBuilder> activeQuery) {
+    public Model(final DriverManager driverManager) {
         this.driverManager = driverManager;
-        mActiveQuery = activeQuery;
+        mActiveQuery = ActiveQuery.from(new MysqlQueryBuilder(), this);
     }
 
     @Override
