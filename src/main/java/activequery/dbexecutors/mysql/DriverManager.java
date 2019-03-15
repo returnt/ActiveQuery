@@ -58,10 +58,10 @@ public class DriverManager {
 
     public <T> List<T> executeQuery(final IQueryBuilder.Select query, final Class<T> tClass) {
         final List<T> resList = new ArrayList<>();
-        for (Map<String, String> map :
+        for (Map<String, Object> map :
             executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName()).stream()
                 .map(stringObjectMap -> stringObjectMap.entrySet().stream()
-                    .collect(toMap(Map.Entry::getKey, stringObjectEntry -> stringObjectEntry.getValue().toString().replace("_", ""))))
+                    .collect(toMap(key -> key.getKey().replace("_", ""), Map.Entry::getValue)))
                 .collect(toList())) {
             resList.add(mObjectMapper.convertValue(map, tClass));
         }
