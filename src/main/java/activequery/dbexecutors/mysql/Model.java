@@ -34,12 +34,16 @@ public abstract class Model implements IModel, ITableSchema {
 
     private DriverManager driverManager;
     private IQuerySource<MysqlQueryBuilder> mActiveQuery;
-    private boolean isSelectOverride;
+    private boolean isSelectOverride = false;
 
     public Model() {
         driverManager = new DriverManager();
         mActiveQuery = ActiveQuery.from(new MysqlQueryBuilder(), this);
-        isSelectOverride = false;
+    }
+
+    public Model(final DriverManager driverManager, final IQuerySource<MysqlQueryBuilder> activeQuery) {
+        this.driverManager = driverManager;
+        mActiveQuery = activeQuery;
     }
 
     @Override

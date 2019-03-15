@@ -36,7 +36,18 @@ public class DriverManager {
     private PreparedStatement stmt;
     private ResultSet rs;
 
+    private final String dbDriver;
+    private final String dbUser;
+    private final String dbPassword;
+
     public DriverManager() {
+        this(System.getenv("DB_DRIVER"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"));
+    }
+
+    public DriverManager(final String dbDriver, final String dbUser, final String dbPassword) {
+        this.dbDriver = dbDriver;
+        this.dbUser = dbUser;
+        this.dbPassword = dbPassword;
         mObjectMapper = new ObjectMapper();
         mObjectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
     }
@@ -56,7 +67,7 @@ public class DriverManager {
     public List<Map<String, Object>> executeQuery(final String query, final List<Object> args, final Set<String> fieldsName) {
         final List<Map<String, Object>> resList = new ArrayList<>();
         try {
-            con = java.sql.DriverManager.getConnection(System.getenv("DB_DRIVER"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"));
+            con = java.sql.DriverManager.getConnection(dbDriver, dbUser, dbPassword);
 
             stmt = con.prepareStatement(query);
 
@@ -112,7 +123,7 @@ public class DriverManager {
 
     public void executeUpdate(final String query, final List<Object> args) {
         try {
-            con = java.sql.DriverManager.getConnection(System.getenv("DB_DRIVER"), System.getenv("DB_USER"), System.getenv("DB_PASSWORD"));
+            con = java.sql.DriverManager.getConnection(dbDriver, dbUser, dbPassword);
             stmt = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             if (args != null && !args.isEmpty()) {
                 for (int i = 1; i <= args.size(); i++) {
