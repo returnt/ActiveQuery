@@ -68,13 +68,14 @@ public class MysqlQueryE2E {
             .get();
         Assert.assertEquals(mUser.getId(), pairRes.get(0).getId());
         Assert.assertEquals(mUser.getEmail(), pairRes.get(0).getEmail());
+        Assert.assertEquals(mUser.getCreatedAt().getDay(), pairRes.get(0).getCreatedAt().getDay());
 
-        final User user = new User(new Random().nextInt(), "sdffs@sdf.sdf", new Date(Calendar.getInstance().getTimeInMillis())).save();
-        final List<User> users = new User().selectAll(User.Fields.id.as("id"), User.Fields.email, User.Fields.createdAt)
-            .get();
+//        final User user = new User(new Random().nextInt(), "sdffs@sdf.sdf", new Date(Calendar.getInstance().getTimeInMillis())).save();
+//        final List<User> users = new User().selectAll(User.Fields.id.as("id"), User.Fields.email, User.Fields.createdAt)
+//            .get();
 
-        Assert.assertNotNull(user);
-        Assert.assertEquals(users.size(), 2);
+//        Assert.assertNotNull(user);
+//        Assert.assertEquals(users.size(), 2);
         // TODO: 08.03.19
 //        Assert.assertEquals(userResult.getCreatedAt().getYear(), pairRes.get(0).getCreatedAt().getYear());
 //        Assert.assertEquals(userResult.getCreatedAt().getMonth(), pairRes.get(0).getCreatedAt().getMonth());

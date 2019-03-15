@@ -61,7 +61,7 @@ public class DriverManager {
         for (Map<String, Object> map :
             executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName()).stream()
                 .map(stringObjectMap -> stringObjectMap.entrySet().stream()
-                    .collect(toMap(key -> key.getKey().replace("_", ""), Map.Entry::getValue)))
+                    .collect(HashMap<String, Object>::new, (m,v)->m.put(v.getKey().replace("_", ""), v.getValue()), HashMap::putAll))
                 .collect(toList())) {
             resList.add(mObjectMapper.convertValue(map, tClass));
         }
