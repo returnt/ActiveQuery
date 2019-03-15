@@ -9,14 +9,17 @@
 package activequery.dbexecutors.mysql;
 
 import activequery.adapters.IQueryBuilder;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 /**
  * Class DriverManager
@@ -50,11 +53,16 @@ public class DriverManager {
         this.dbPassword = dbPassword;
         mObjectMapper = new ObjectMapper();
         mObjectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+        mObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public <T> List<T> executeQuery(final IQueryBuilder.Select query, final Class<T> tClass) {
         final List<T> resList = new ArrayList<>();
-        for (Map<String, Object> map : executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName())) {
+        for (Map<String, String> map :
+            executeQuery(query.getQuery().toString(), query.getQueryArguments(), query.getResultFieldsName()).stream()
+                .map(stringObjectMap -> stringObjectMap.entrySet().stream()
+                    .collect(toMap(Map.Entry::getKey, stringObjectEntry -> stringObjectEntry.getValue().toString().replace("_", ""))))
+                .collect(toList())) {
             resList.add(mObjectMapper.convertValue(map, tClass));
         }
         return resList;
