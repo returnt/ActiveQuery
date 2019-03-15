@@ -80,7 +80,7 @@ public class DriverManager {
             rs = stmt.executeQuery();
 
             while (rs.next()) {
-                final Map<String, Object> map = new ConcurrentHashMap<>();
+                final Map<String, Object> map = new HashMap<>();
                 if (!fieldsName.isEmpty()) {
                     for (String fieldName : fieldsName) {
                         map.put(fieldName, rs.getObject(fieldName));
