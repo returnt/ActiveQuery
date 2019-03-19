@@ -28,15 +28,15 @@ public class User extends Model {
     @PrimaryKey
     private Integer id;
     private String email;
-    private Date created_at;
+    private Date createdAt;
 
     public User() {
     }
 
-    public User(Integer id, String email, Date created_at) {
+    public User(Integer id, String email, Date createdAt) {
         this.id = id;
         this.email = email;
-        this.created_at = created_at;
+        this.createdAt = createdAt;
     }
 
     public Integer getId() {
@@ -47,8 +47,8 @@ public class User extends Model {
         return email;
     }
 
-    public Date getCreated_at() {
-        return created_at;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
     @Override
