@@ -29,24 +29,24 @@ import static activequery.adapters.IQueryBuilder.quoteName;
  */
 public class MysqlQueryBuilder implements IQueryBuilder.Select {
 
-    private final Set<String> mFrom;
-    private final Set<String> mSelect;
+    private final List<String> mFrom;
+    private final List<String> mSelect;
     private final List<String> mWhere;
     private final List<String> mJoin;
-    private final Set<String> mGroupBy;
-    private final Set<String> mOrderBy;
+    private final List<String> mGroupBy;
+    private final List<String> mOrderBy;
     private final List<Object> mQueryArgs;
     private Long mLimit;
     private Long mOffset;
     private final StringBuilder mQuery;
 
     public MysqlQueryBuilder() {
-        mFrom = new HashSet<>();
-        mSelect = new HashSet<>();
+        mFrom = new ArrayList<>();
+        mSelect = new ArrayList<>();
         mWhere = new ArrayList<>();
         mJoin = new ArrayList<>();
-        mGroupBy = new HashSet<>();
-        mOrderBy = new HashSet<>();
+        mGroupBy = new ArrayList<>();
+        mOrderBy = new ArrayList<>();
         mQueryArgs = new ArrayList<>();
         mLimit = null;
         mOffset = null;
