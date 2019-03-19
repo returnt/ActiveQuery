@@ -40,6 +40,8 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
     private Long mOffset;
     private final StringBuilder mQuery;
 
+    private final Pattern p = Pattern.compile("[.+]?`(\\w+)`$");
+
     public MysqlQueryBuilder() {
         mFrom = new ArrayList<>();
         mSelect = new ArrayList<>();
@@ -165,7 +167,6 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
     }
 
     public Set<String> getResultFieldsName() {
-        final Pattern p = Pattern.compile("[.+]?`(\\w+)`$");
         return mSelect.stream()
             .map(p::matcher)
             .filter(Matcher::find)
@@ -269,27 +270,27 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
         final StringBuilder condition = new StringBuilder();
         if (field instanceof Count) {
             condition.append("COUNT(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof Avg) {
             condition.append("AVG(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof Max) {
             condition.append("MAX(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof Min) {
             condition.append("MIN(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof Sum) {
             condition.append("SUM(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof Distinct) {
             condition.append("DISTINCT(");
-            condition.append(quoteField(field));
+            condition.append(unzipField(field));
             condition.append(")");
         } else if (field instanceof All) {
             condition.append(quoteName(field.table()).concat(".").concat(field.field()));
@@ -297,6 +298,11 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
             condition.append(quoteField(field));
         }
         return condition.toString();
+    }
+
+    private String unzipField(final Field field) {
+        final AbstractField abstractField = (AbstractField) field;
+        return mapAggregation(abstractField.getField());
     }
 
     private String calculateJoin(final String joinType, final String table, final WhereGroup join) {
@@ -311,17 +317,11 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
     private void calculateWhereGroup(final List<String> condition, final WhereGroup whereGroup) {
         for (Object o : whereGroup.getObjects()) {
             if (o instanceof WhereGroup.And) {
-                if (!condition.isEmpty()) {
-                    condition.add("AND");
-                }
+                addIfNotEmpty(condition, "AND");
             } else if (o instanceof WhereGroup.Not) {
-                if (!condition.isEmpty()) {
-                    condition.add("NOT");
-                }
+                addIfNotEmpty(condition, "NOT");
             } else if (o instanceof WhereGroup.Or) {
-                if (!condition.isEmpty()) {
-                    condition.add("OR");
-                }
+                addIfNotEmpty(condition, "OR");
             } else if (o instanceof WhereFunc.Where) {
                 condition.add(calculateWhere((WhereFunc.Where) o));
             } else if (o instanceof WhereGroup.GroupStart) {
@@ -346,5 +346,11 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
             whereCondition.append(mapConditionR(where.operator(), where.r()));
         }
         return whereCondition.toString();
+    }
+
+    private void addIfNotEmpty(final List<String> conditions, final String condition) {
+        if (!conditions.isEmpty()) {
+            conditions.add(condition);
+        }
     }
 }

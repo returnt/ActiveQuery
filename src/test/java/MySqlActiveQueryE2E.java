@@ -37,7 +37,7 @@ import static activequery.conditions.Condition.*;
  */
 public class MySqlActiveQueryE2E {
 
-    private static final String SELECT = "SELECT `users`.*, COUNT(`users`.`id`) AS `countId`, `users`.`id` AS `ID`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, DISTINCT(`users`.`id`) AS `ID`, `id`, `email`, SUM(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID` FROM `users`";
+    private static final String SELECT = "SELECT DISTINCT(COUNT(`users`.`id`)) AS `ID`, `users`.*, `users`.`id` AS `ID`, `email`, COUNT(`users`.`id`) AS `countId`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID`, SUM(`users`.`id`) AS `ID`, `id` FROM `users`";
     private static final String FROM = "SELECT `users`.* FROM `users`, `users_roles`";
     private static final String WHERE = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` %s ?";
     private static final String WHERE_AND = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` = `users`.`id` AND `users`.`id` = `users`.`id`";
@@ -56,7 +56,7 @@ public class MySqlActiveQueryE2E {
     private static final String RIGHT_JOIN = "SELECT `users`.`id` AS `ID` FROM `users` RIGHT JOIN `users_roles` ON `users_roles`.`users_id` = `users`.`id` OR `users_roles`.`users_id` = ?";
     private static final String RIGHT_JOIN_2 = "SELECT `users`.`id` AS `ID` FROM `users` RIGHT JOIN `users_roles` ON `users_roles`.`users_id` = `users`.`id`";
     private static final String GROUP_BY = "SELECT `users`.`id` AS `ID` FROM `users` GROUP BY `users`.`id`, `users_roles`.`users_id`";
-    private static final String ORDER_BY = "SELECT `users`.`id` AS `ID` FROM `users` ORDER BY COUNT(`users_roles`.`users_id`) DESC, `users`.`id` ASC";
+    private static final String ORDER_BY = "SELECT `users`.`id` AS `ID` FROM `users` ORDER BY `users`.`id` ASC, COUNT(`users_roles`.`users_id`) DESC";
     private static final String LIMIT = "SELECT `users`.`id` AS `ID` FROM `users` LIMIT 10";
     private static final String OFFSET = "SELECT `users`.`id` AS `ID` FROM `users` OFFSET 10";
 
@@ -64,7 +64,7 @@ public class MySqlActiveQueryE2E {
     public void select() {
         final String query = getActiveQuery(User.class)
             .select(
-                DISTINCT(User.Fields.id),
+                DISTINCT(COUNT(User.Fields.id)),
                 ALL(User.class),
                 User.Fields.id, User.Fields.email,
                 COUNT(User.Fields.id).as("countId"),

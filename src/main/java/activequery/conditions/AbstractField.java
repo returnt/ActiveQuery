@@ -111,4 +111,8 @@ public abstract class AbstractField implements Field, WhereOperator {
             }
         };
     }
+
+    public Field getField() {
+        return mField;
+    }
 }
