@@ -9,6 +9,7 @@
 import activequery.ActiveQuery;
 import activequery.IQuerySource;
 import activequery.adapters.MysqlQueryBuilder;
+import activequery.aggregations.Distinct;
 import activequery.conditions.*;
 import models.User;
 import models.UserRole;
@@ -20,6 +21,7 @@ import java.util.Arrays;
 import static activequery.aggregations.All.ALL;
 import static activequery.aggregations.Avg.AVG;
 import static activequery.aggregations.Count.COUNT;
+import static activequery.aggregations.Distinct.DISTINCT;
 import static activequery.aggregations.Max.MAX;
 import static activequery.aggregations.Min.MIN;
 import static activequery.aggregations.Sum.SUM;
@@ -35,7 +37,7 @@ import static activequery.conditions.Condition.*;
  */
 public class MySqlActiveQueryE2E {
 
-    private static final String SELECT = "SELECT `users`.*, COUNT(`users`.`id`) AS `countId`, `users`.`id` AS `ID`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, `id`, `email`, SUM(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID` FROM `users`";
+    private static final String SELECT = "SELECT `users`.*, COUNT(`users`.`id`) AS `countId`, `users`.`id` AS `ID`, AVG(`users_roles`.`users_id`) AS `roleId`, MAX(`users`.`id`) AS `ID`, DISTINCT(`users`.`id`) AS `ID`, `id`, `email`, SUM(`users`.`id`) AS `ID`, MIN(`users`.`id`) AS `ID` FROM `users`";
     private static final String FROM = "SELECT `users`.* FROM `users`, `users_roles`";
     private static final String WHERE = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` %s ?";
     private static final String WHERE_AND = "SELECT `users`.`id` AS `ID` FROM `users` WHERE `users`.`id` = `users`.`id` AND `users`.`id` = `users`.`id`";
@@ -62,6 +64,7 @@ public class MySqlActiveQueryE2E {
     public void select() {
         final String query = getActiveQuery(User.class)
             .select(
+                DISTINCT(User.Fields.id),
                 ALL(User.class),
                 User.Fields.id, User.Fields.email,
                 COUNT(User.Fields.id).as("countId"),

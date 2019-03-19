@@ -287,6 +287,10 @@ public class MysqlQueryBuilder implements IQueryBuilder.Select {
             condition.append("SUM(");
             condition.append(quoteField(field));
             condition.append(")");
+        } else if (field instanceof Distinct) {
+            condition.append("DISTINCT(");
+            condition.append(quoteField(field));
+            condition.append(")");
         } else if (field instanceof All) {
             condition.append(quoteName(field.table()).concat(".").concat(field.field()));
         } else {
