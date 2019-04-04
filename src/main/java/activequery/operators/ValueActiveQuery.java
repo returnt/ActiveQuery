@@ -31,8 +31,6 @@ public class ValueActiveQuery<T extends IQueryBuilder.Save> extends ActiveQueryS
     @Override
     public void subscribeActual() throws Exception {
         mActiveQuery.subscribeActual();
-        for (Object o : mValues) {
-            mQueryBuilder.applyValue(o);
-        }
+        mQueryBuilder.applyValue(mValues);
     }
 }

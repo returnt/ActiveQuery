@@ -48,7 +48,7 @@ public interface IQueryBuilder {
 
         void applyInsert(final Field fields);
 
-        void applyValue(final Object values);
+        void applyValue(final Object[] values);
     }
 
     interface Select extends IQueryBuilder {

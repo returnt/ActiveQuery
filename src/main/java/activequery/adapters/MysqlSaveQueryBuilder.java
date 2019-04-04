@@ -11,12 +11,10 @@ package activequery.adapters;
 import activequery.conditions.Field;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static activequery.adapters.IQueryBuilder.quoteField;
 import static activequery.adapters.IQueryBuilder.quoteName;
 
 /**
@@ -30,13 +28,13 @@ import static activequery.adapters.IQueryBuilder.quoteName;
 public class MysqlSaveQueryBuilder implements IQueryBuilder.Save {
 
     private String mTable;
-    private final Set<String> mFields;
-    private final List<Object> mValue;
+    private final List<String> mFields;
+    private final List<Object[]> mValue;
     private final StringBuilder mQuery;
 
     public MysqlSaveQueryBuilder() {
         mTable = "";
-        mFields = new HashSet<>();
+        mFields = new ArrayList<>();
         mValue = new ArrayList<>();
         mQuery = new StringBuilder();
     }
@@ -52,7 +50,7 @@ public class MysqlSaveQueryBuilder implements IQueryBuilder.Save {
     }
 
     @Override
-    public void applyValue(final Object value) {
+    public void applyValue(final Object... value) {
         mValue.add(value);
     }
 
@@ -61,7 +59,7 @@ public class MysqlSaveQueryBuilder implements IQueryBuilder.Save {
     }
 
     private String buildValues() {
-        return mValue.stream().map(o -> "?").collect(Collectors.joining(", "));
+        return mValue.stream().map(objects -> "(".concat(Arrays.stream(objects).map(o -> "?").collect(Collectors.joining(", ")).concat(")"))).collect(Collectors.joining(", "));
     }
 
     @Override
@@ -73,7 +71,7 @@ public class MysqlSaveQueryBuilder implements IQueryBuilder.Save {
             mQuery.append(" (").append(buildFields()).append(")");
         }
         if (!mValue.isEmpty()) {
-            mQuery.append(" VALUES ").append("(").append(buildValues()).append(")");
+            mQuery.append(" VALUES ").append(buildValues());
         }
     }
 
@@ -89,6 +87,6 @@ public class MysqlSaveQueryBuilder implements IQueryBuilder.Save {
 
     @Override
     public List<Object> getQueryArguments() {
-        return mValue;
+        return mValue.stream().flatMap(Arrays::stream).collect(Collectors.toList());
     }
 }
